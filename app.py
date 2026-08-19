@@ -12,11 +12,7 @@ st.set_page_config(
     layout="centered"
 )
 
-st.markdown(
-    '<div class="main-title">⚔️ BOSS BATTLE RPG ⚔️</div>',
-    unsafe_allow_html=True
-)
-)
+
 # ============================================================
 # CUSTOM UI
 # ============================================================
@@ -147,7 +143,6 @@ st.markdown("""
        -------------------------------------------------------- */
 
     div[data-testid="stProgress"] > div > div {
-
         background-color: #009E49;
     }
 
@@ -172,12 +167,16 @@ st.markdown("""
         overflow-y: auto;
     }
 
+    .log-entry {
+        padding: 5px 0;
+        border-bottom: 1px solid rgba(252, 209, 22, 0.12);
+    }
+
     /* --------------------------------------------------------
        DIVIDERS
        -------------------------------------------------------- */
 
     hr {
-
         border-color: rgba(252, 209, 22, 0.35);
     }
 
@@ -186,17 +185,29 @@ st.markdown("""
        -------------------------------------------------------- */
 
     div[data-testid="stAlert"] {
-
         border-radius: 12px;
     }
 
 </style>
 """, unsafe_allow_html=True)
+
+
+# ============================================================
+# TITLE
+# ============================================================
+
+st.markdown(
+    '<div class="main-title">⚔️ BOSS BATTLE RPG ⚔️</div>',
+    unsafe_allow_html=True
+)
+
+
 # ============================================================
 # BASE CHARACTER CLASS
 # ============================================================
 
 class Character:
+
     def __init__(self, name):
         self.name = name
         self.health = 100
@@ -216,11 +227,14 @@ class Character:
 
     def crit_check(self, damage):
         """20% chance to deal 1.5x damage."""
+
         if random.random() < 0.20:
             return int(damage * 1.5), "🔥 Critical Hit!"
+
         return damage, ""
 
     def basic_attack(self, other):
+
         damage = random.randint(5, 10)
 
         damage, crit_message = self.crit_check(damage)
@@ -233,16 +247,20 @@ class Character:
             messages.append(crit_message)
 
         messages.append(
-            f"{self.name} punches {other.name} for {damage} damage!"
+            f"{self.name} punches "
+            f"{other.name} for {damage} damage!"
         )
 
         return messages
 
     def heal(self):
+
         if self.mana >= 10:
+
             self.mana -= 10
 
             heal_amount = random.randint(15, 25)
+
             old_health = self.health
 
             self.health = min(
@@ -260,6 +278,7 @@ class Character:
         return False, "Not enough mana to heal."
 
     def meditate(self):
+
         regen = random.randint(10, 20)
 
         old_mana = self.mana
@@ -287,6 +306,7 @@ class Warrior(Character):
 
     def crit_check(self, damage):
         """35% chance to deal 1.5x damage."""
+
         if random.random() < 0.35:
             return int(damage * 1.5), "🔥 Critical Hit!"
 
@@ -301,6 +321,7 @@ class Warrior(Character):
             damage, crit_message = self.crit_check(damage)
 
             self.mana -= 15
+
             other.health -= damage
 
             messages = []
@@ -337,6 +358,7 @@ class Paladin(Character):
             damage, crit_message = self.crit_check(damage)
 
             self.mana -= 15
+
             other.health -= damage
 
             messages = []
@@ -350,6 +372,7 @@ class Paladin(Character):
             )
 
             if random.random() < 0.25:
+
                 messages.append(
                     f"⚡ {other.name} is stunned!"
                 )
@@ -393,6 +416,7 @@ class Boss(Character):
                 messages.append(crit_message)
 
             self.mana -= 20
+
             target.health -= damage
 
             messages.append(
@@ -413,6 +437,7 @@ class Boss(Character):
         # ----------------------------------------------------
 
         if self.health < 60 and self.mana >= 10:
+
             options.append(
                 ("heal", 40 + (60 - self.health))
             )
@@ -422,6 +447,7 @@ class Boss(Character):
         # ----------------------------------------------------
 
         if self.mana < 10:
+
             options.append(
                 ("meditate", 30 - self.mana)
             )
@@ -431,6 +457,7 @@ class Boss(Character):
         # ----------------------------------------------------
 
         if self.mana >= 20:
+
             options.append(
                 ("special", 10 + (100 - target.health))
             )
@@ -444,12 +471,14 @@ class Boss(Character):
         )
 
         # Choose highest score
+
         best = max(
             options,
             key=lambda x: x[1]
         )[0]
 
         # Perform action
+
         if best == "heal":
 
             success, message = self.heal()
@@ -493,30 +522,40 @@ if "battle_log" not in st.session_state:
 def add_messages(messages):
 
     if isinstance(messages, str):
+
         st.session_state.battle_log.append(messages)
 
     else:
+
         st.session_state.battle_log.extend(messages)
 
 
 def reset_game():
 
     st.session_state.game_started = False
+
     st.session_state.player = None
+
     st.session_state.boss = None
+
     st.session_state.battle_log = []
 
 
 def boss_turn():
 
     player = st.session_state.player
+
     boss = st.session_state.boss
 
     if boss.is_alive() and player.is_alive():
 
-        add_messages(f"👹 {boss.name}'s turn...")
+        add_messages(
+            f"👹 {boss.name}'s turn..."
+        )
 
-        boss_messages = boss.choose_ai_action(player)
+        boss_messages = boss.choose_ai_action(
+            player
+        )
 
         add_messages(boss_messages)
 
@@ -544,30 +583,43 @@ if not st.session_state.game_started:
     ):
 
         if name.strip() == "":
-            st.error("Please enter a name.")
+
+            st.error(
+                "Please enter a name."
+            )
 
         else:
 
             # Create player
+
             if class_choice == "Warrior":
+
                 player = Warrior(name)
+
             else:
+
                 player = Paladin(name)
 
             # Create boss
+
             boss = Boss()
 
-            # Save the game
+            # Save game
+
             st.session_state.player = player
+
             st.session_state.boss = boss
 
-            # IMPORTANT:
-            # These messages are created ONLY ONCE,
-            # when the battle begins.
+            # Starting messages ONLY happen once
+
             st.session_state.battle_log = [
+
                 "⚔️ Battle Start!",
+
                 f"{player.name} enters the battlefield!",
+
                 "👹 A powerful enemy stands in your way!"
+
             ]
 
             st.session_state.game_started = True
@@ -582,67 +634,83 @@ if not st.session_state.game_started:
 else:
 
     player = st.session_state.player
+
     boss = st.session_state.boss
 
-    # --------------------------------------------------------
+
+    # ========================================================
     # PLAYER STATUS
-    # --------------------------------------------------------
+    # ========================================================
 
-st.markdown(
-    f"""
-    <div class="character-card">
-        <div class="character-name">
-            🪖 {player.name}
+    st.markdown(
+        f"""
+        <div class="character-card">
+
+            <div class="character-name">
+                🪖 {player.name}
+            </div>
+
+            <br>
+
+            ❤️ HP:
+            {max(player.health, 0)}/{player.max_health}
+
         </div>
-        <br>
-        ❤️ HP: {max(player.health, 0)}/{player.max_health}
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+        """,
+        unsafe_allow_html=True
+    )
 
-st.progress(
-    max(player.health, 0) / player.max_health
-)
+    st.progress(
+        max(player.health, 0) / player.max_health
+    )
 
-st.write(
-    f"🔵 Mana: {player.mana}/{player.max_mana}"
-)
+    st.write(
+        f"🔵 Mana: "
+        f"{player.mana}/{player.max_mana}"
+    )
 
-st.progress(
-    player.mana / player.max_mana
-)
+    st.progress(
+        player.mana / player.max_mana
+    )
 
     st.divider()
 
-    # --------------------------------------------------------
+
+    # ========================================================
     # BOSS STATUS
-    # --------------------------------------------------------
+    # ========================================================
 
-   st.markdown(
-    f"""
-    <div class="character-card">
-        <div class="character-name">
-            👹 {boss.name}
+    st.markdown(
+        f"""
+        <div class="character-card">
+
+            <div class="character-name">
+                👹 {boss.name}
+            </div>
+
+            <br>
+
+            ❤️ HP:
+            {max(boss.health, 0)}/{boss.max_health}
+
         </div>
-        <br>
-        ❤️ HP: {max(boss.health, 0)}/{boss.max_health}
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+        """,
+        unsafe_allow_html=True
+    )
 
-st.progress(
-    max(boss.health, 0) / boss.max_health
-)
+    st.progress(
+        max(boss.health, 0) / boss.max_health
+    )
 
-st.write(
-    f"🔵 Mana: {boss.mana}/{boss.max_mana}"
-)
+    st.write(
+        f"🔵 Mana: "
+        f"{boss.mana}/{boss.max_mana}"
+    )
 
-st.progress(
-    boss.mana / boss.max_mana
-)
+    st.progress(
+        boss.mana / boss.max_mana
+    )
+
     st.divider()
 
 
@@ -656,7 +724,9 @@ st.progress(
             f"💀 {player.name} has been defeated..."
         )
 
-        st.subheader("Game Over")
+        st.subheader(
+            "Game Over"
+        )
 
         if st.button(
             "🔄 Restart",
@@ -678,7 +748,9 @@ st.progress(
             f"🎉 {boss.name} has been defeated!"
         )
 
-        st.subheader("🏆 Victory!")
+        st.subheader(
+            "🏆 Victory!"
+        )
 
         if st.button(
             "🔄 Play Again",
@@ -714,7 +786,9 @@ st.progress(
                 use_container_width=True
             ):
 
-                messages = player.basic_attack(boss)
+                messages = player.basic_attack(
+                    boss
+                )
 
                 add_messages(messages)
 
@@ -736,11 +810,14 @@ st.progress(
                 use_container_width=True
             ):
 
-                success, messages = player.special_attack(boss)
+                success, messages = (
+                    player.special_attack(boss)
+                )
 
                 add_messages(messages)
 
-                # Only successful attacks use a turn
+                # Failed special does NOT use a turn
+
                 if success and boss.is_alive():
 
                     boss_turn()
@@ -763,7 +840,8 @@ st.progress(
 
                 add_messages(message)
 
-                # Failed healing DOES NOT use a turn
+                # Failed healing does NOT use a turn
+
                 if success and boss.is_alive():
 
                     boss_turn()
@@ -799,11 +877,26 @@ st.progress(
 
     st.divider()
 
-    st.subheader("📜 Battle Log")
+    st.subheader(
+        "📜 Battle Log"
+    )
+
+    log_html = '<div class="battle-log">'
 
     for message in st.session_state.battle_log:
 
-        st.write(message)
+        log_html += (
+            f'<div class="log-entry">'
+            f'{message}'
+            f'</div>'
+        )
+
+    log_html += "</div>"
+
+    st.markdown(
+        log_html,
+        unsafe_allow_html=True
+    )
 
 
     # ========================================================
