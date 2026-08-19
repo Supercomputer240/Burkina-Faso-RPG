@@ -12,8 +12,11 @@ st.set_page_config(
     layout="centered"
 )
 
-st.title("⚔️ Boss Battle RPG")
-
+st.markdown(
+    '<div class="main-title">⚔️ BOSS BATTLE RPG ⚔️</div>',
+    unsafe_allow_html=True
+)
+)
 # ============================================================
 # CUSTOM UI
 # ============================================================
@@ -21,60 +24,174 @@ st.title("⚔️ Boss Battle RPG")
 st.markdown("""
 <style>
 
+    /* ========================================================
+       BURKINA FASO THEME
+       ======================================================== */
+
     .stApp {
-        background-color: #0e1117;
+        background:
+            linear-gradient(
+                135deg,
+                #071a12 0%,
+                #0b2418 45%,
+                #24100f 100%
+            );
+        color: white;
     }
+
+    /* --------------------------------------------------------
+       MAIN TITLE
+       -------------------------------------------------------- */
 
     .main-title {
         text-align: center;
-        font-size: 45px;
-        font-weight: bold;
+        font-size: 48px;
+        font-weight: 900;
+        color: #FCD116;
+        text-shadow:
+            0px 0px 12px rgba(252, 209, 22, 0.35);
         margin-bottom: 30px;
     }
 
+    /* --------------------------------------------------------
+       CHARACTER CARDS
+       -------------------------------------------------------- */
+
     .character-card {
-        background-color: #161b22;
-        border: 1px solid #30363d;
-        border-radius: 15px;
+        background:
+            linear-gradient(
+                145deg,
+                #10251a,
+                #19120f
+            );
+
+        border: 2px solid #FCD116;
+        border-radius: 18px;
+
         padding: 20px;
-        margin-bottom: 20px;
+
+        margin-bottom: 15px;
+
+        box-shadow:
+            0px 0px 15px rgba(252, 209, 22, 0.12);
     }
 
     .character-name {
-        font-size: 24px;
-        font-weight: bold;
         text-align: center;
+
+        font-size: 25px;
+        font-weight: 800;
+
+        color: #FCD116;
     }
 
-    .battle-log {
-        background-color: #161b22;
-        border: 1px solid #30363d;
-        border-radius: 15px;
-        padding: 15px;
-        height: 250px;
-        overflow-y: auto;
+    /* --------------------------------------------------------
+       BATTLE AREA
+       -------------------------------------------------------- */
+
+    .battle-area {
+        background-color: rgba(0, 0, 0, 0.25);
+
+        border: 1px solid rgba(252, 209, 22, 0.35);
+
+        border-radius: 20px;
+
+        padding: 25px;
+
+        margin-top: 20px;
+        margin-bottom: 20px;
     }
+
+    /* --------------------------------------------------------
+       BUTTONS
+       -------------------------------------------------------- */
 
     .stButton > button {
+
         width: 100%;
-        height: 55px;
+
+        height: 58px;
+
         border-radius: 12px;
+
         font-size: 17px;
-        font-weight: bold;
-        border: 1px solid #444;
-        background-color: #21262d;
+
+        font-weight: 800;
+
         color: white;
-        transition: 0.2s;
+
+        background-color: #16251c;
+
+        border: 2px solid #009E49;
+
+        transition:
+            transform 0.15s,
+            background-color 0.15s,
+            border-color 0.15s;
+
     }
 
     .stButton > button:hover {
-        background-color: #30363d;
-        border-color: #888;
+
+        background-color: #1d3828;
+
+        border-color: #FCD116;
+
+        transform: scale(1.02);
+
+        color: #FCD116;
+    }
+
+    /* --------------------------------------------------------
+       PROGRESS BARS
+       -------------------------------------------------------- */
+
+    div[data-testid="stProgress"] > div > div {
+
+        background-color: #009E49;
+    }
+
+    /* --------------------------------------------------------
+       BATTLE LOG
+       -------------------------------------------------------- */
+
+    .battle-log {
+
+        background-color: rgba(10, 20, 14, 0.9);
+
+        border: 2px solid #EF2B2D;
+
+        border-radius: 15px;
+
+        padding: 18px;
+
+        margin-top: 20px;
+
+        max-height: 300px;
+
+        overflow-y: auto;
+    }
+
+    /* --------------------------------------------------------
+       DIVIDERS
+       -------------------------------------------------------- */
+
+    hr {
+
+        border-color: rgba(252, 209, 22, 0.35);
+    }
+
+    /* --------------------------------------------------------
+       SUCCESS / ERROR BOXES
+       -------------------------------------------------------- */
+
+    div[data-testid="stAlert"] {
+
+        border-radius: 12px;
     }
 
 </style>
 """, unsafe_allow_html=True)
-
 # ============================================================
 # BASE CHARACTER CLASS
 # ============================================================
@@ -471,23 +588,30 @@ else:
     # PLAYER STATUS
     # --------------------------------------------------------
 
-    st.subheader(f"🪖 {player.name}")
+st.markdown(
+    f"""
+    <div class="character-card">
+        <div class="character-name">
+            🪖 {player.name}
+        </div>
+        <br>
+        ❤️ HP: {max(player.health, 0)}/{player.max_health}
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
-    st.progress(
-        max(player.health, 0) / player.max_health
-    )
+st.progress(
+    max(player.health, 0) / player.max_health
+)
 
-    st.write(
-        f"❤️ HP: {max(player.health, 0)}/{player.max_health}"
-    )
+st.write(
+    f"🔵 Mana: {player.mana}/{player.max_mana}"
+)
 
-    st.progress(
-        player.mana / player.max_mana
-    )
-
-    st.write(
-        f"🔵 Mana: {player.mana}/{player.max_mana}"
-    )
+st.progress(
+    player.mana / player.max_mana
+)
 
     st.divider()
 
@@ -495,24 +619,30 @@ else:
     # BOSS STATUS
     # --------------------------------------------------------
 
-    st.subheader(f"👹 {boss.name}")
+   st.markdown(
+    f"""
+    <div class="character-card">
+        <div class="character-name">
+            👹 {boss.name}
+        </div>
+        <br>
+        ❤️ HP: {max(boss.health, 0)}/{boss.max_health}
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
-    st.progress(
-        max(boss.health, 0) / boss.max_health
-    )
+st.progress(
+    max(boss.health, 0) / boss.max_health
+)
 
-    st.write(
-        f"❤️ HP: {max(boss.health, 0)}/{boss.max_health}"
-    )
+st.write(
+    f"🔵 Mana: {boss.mana}/{boss.max_mana}"
+)
 
-    st.progress(
-        boss.mana / boss.max_mana
-    )
-
-    st.write(
-        f"🔵 Mana: {boss.mana}/{boss.max_mana}"
-    )
-
+st.progress(
+    boss.mana / boss.max_mana
+)
     st.divider()
 
 
