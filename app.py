@@ -14,6 +14,66 @@ st.set_page_config(
 
 st.title("⚔️ Boss Battle RPG")
 
+# ============================================================
+# CUSTOM UI
+# ============================================================
+
+st.markdown("""
+<style>
+
+    .stApp {
+        background-color: #0e1117;
+    }
+
+    .main-title {
+        text-align: center;
+        font-size: 45px;
+        font-weight: bold;
+        margin-bottom: 30px;
+    }
+
+    .character-card {
+        background-color: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .character-name {
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .battle-log {
+        background-color: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 15px;
+        padding: 15px;
+        height: 250px;
+        overflow-y: auto;
+    }
+
+    .stButton > button {
+        width: 100%;
+        height: 55px;
+        border-radius: 12px;
+        font-size: 17px;
+        font-weight: bold;
+        border: 1px solid #444;
+        background-color: #21262d;
+        color: white;
+        transition: 0.2s;
+    }
+
+    .stButton > button:hover {
+        background-color: #30363d;
+        border-color: #888;
+    }
+
+</style>
+""", unsafe_allow_html=True)
 
 # ============================================================
 # BASE CHARACTER CLASS
