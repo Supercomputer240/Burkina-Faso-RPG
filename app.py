@@ -1,6 +1,7 @@
 import streamlit as st
 import random
 
+
 # ============================================================
 # PAGE SETUP
 # ============================================================
@@ -230,25 +231,37 @@ class Boss(Character):
 
         options = []
 
+        # ----------------------------------------------------
         # HEAL
+        # ----------------------------------------------------
+
         if self.health < 60 and self.mana >= 10:
             options.append(
                 ("heal", 40 + (60 - self.health))
             )
 
+        # ----------------------------------------------------
         # MEDITATE
+        # ----------------------------------------------------
+
         if self.mana < 10:
             options.append(
                 ("meditate", 30 - self.mana)
             )
 
+        # ----------------------------------------------------
         # SPECIAL
+        # ----------------------------------------------------
+
         if self.mana >= 20:
             options.append(
                 ("special", 10 + (100 - target.health))
             )
 
+        # ----------------------------------------------------
         # BASIC ATTACK
+        # ----------------------------------------------------
+
         options.append(
             ("basic", 5 + random.randint(0, 5))
         )
@@ -297,7 +310,7 @@ if "battle_log" not in st.session_state:
 
 
 # ============================================================
-# BATTLE LOG
+# HELPER FUNCTIONS
 # ============================================================
 
 def add_messages(messages):
@@ -307,6 +320,28 @@ def add_messages(messages):
 
     else:
         st.session_state.battle_log.extend(messages)
+
+
+def reset_game():
+
+    st.session_state.game_started = False
+    st.session_state.player = None
+    st.session_state.boss = None
+    st.session_state.battle_log = []
+
+
+def boss_turn():
+
+    player = st.session_state.player
+    boss = st.session_state.boss
+
+    if boss.is_alive() and player.is_alive():
+
+        add_messages(f"👹 {boss.name}'s turn...")
+
+        boss_messages = boss.choose_ai_action(player)
+
+        add_messages(boss_messages)
 
 
 # ============================================================
@@ -336,14 +371,22 @@ if not st.session_state.game_started:
 
         else:
 
+            # Create player
             if class_choice == "Warrior":
                 player = Warrior(name)
             else:
                 player = Paladin(name)
 
-            st.session_state.player = player
-            st.session_state.boss = Boss()
+            # Create boss
+            boss = Boss()
 
+            # Save the game
+            st.session_state.player = player
+            st.session_state.boss = boss
+
+            # IMPORTANT:
+            # These messages are created ONLY ONCE,
+            # when the battle begins.
             st.session_state.battle_log = [
                 "⚔️ Battle Start!",
                 f"{player.name} enters the battlefield!",
@@ -389,7 +432,7 @@ else:
     st.divider()
 
     # --------------------------------------------------------
-    # ENEMY STATUS
+    # BOSS STATUS
     # --------------------------------------------------------
 
     st.subheader(f"👹 {boss.name}")
@@ -412,6 +455,7 @@ else:
 
     st.divider()
 
+
     # ========================================================
     # GAME OVER
     # ========================================================
@@ -429,12 +473,10 @@ else:
             use_container_width=True
         ):
 
-            st.session_state.game_started = False
-            st.session_state.player = None
-            st.session_state.boss = None
-            st.session_state.battle_log = []
+            reset_game()
 
             st.rerun()
+
 
     # ========================================================
     # VICTORY
@@ -453,12 +495,10 @@ else:
             use_container_width=True
         ):
 
-            st.session_state.game_started = False
-            st.session_state.player = None
-            st.session_state.boss = None
-            st.session_state.battle_log = []
+            reset_game()
 
             st.rerun()
+
 
     # ========================================================
     # PLAYER TURN
@@ -466,11 +506,17 @@ else:
 
     else:
 
-        st.subheader(f"🎯 {player.name}'s Turn")
+        st.subheader(
+            f"🎯 {player.name}'s Turn"
+        )
 
         col1, col2 = st.columns(2)
 
+
+        # ----------------------------------------------------
         # BASIC ATTACK
+        # ----------------------------------------------------
+
         with col1:
 
             if st.button(
@@ -484,17 +530,15 @@ else:
 
                 if boss.is_alive():
 
-                    add_messages(
-                        f"👹 {boss.name}'s turn..."
-                    )
-
-                    boss_messages = boss.choose_ai_action(player)
-
-                    add_messages(boss_messages)
+                    boss_turn()
 
                 st.rerun()
 
+
+        # ----------------------------------------------------
         # SPECIAL ATTACK
+        # ----------------------------------------------------
+
         with col2:
 
             if st.button(
@@ -506,19 +550,18 @@ else:
 
                 add_messages(messages)
 
+                # Only successful attacks use a turn
                 if success and boss.is_alive():
 
-                    add_messages(
-                        f"👹 {boss.name}'s turn..."
-                    )
-
-                    boss_messages = boss.choose_ai_action(player)
-
-                    add_messages(boss_messages)
+                    boss_turn()
 
                 st.rerun()
 
+
+        # ----------------------------------------------------
         # HEAL
+        # ----------------------------------------------------
+
         with col1:
 
             if st.button(
@@ -530,20 +573,18 @@ else:
 
                 add_messages(message)
 
-                # Failed healing does NOT use a turn
+                # Failed healing DOES NOT use a turn
                 if success and boss.is_alive():
 
-                    add_messages(
-                        f"👹 {boss.name}'s turn..."
-                    )
-
-                    boss_messages = boss.choose_ai_action(player)
-
-                    add_messages(boss_messages)
+                    boss_turn()
 
                 st.rerun()
 
+
+        # ----------------------------------------------------
         # MEDITATE
+        # ----------------------------------------------------
+
         with col2:
 
             if st.button(
@@ -557,15 +598,10 @@ else:
 
                 if boss.is_alive():
 
-                    add_messages(
-                        f"👹 {boss.name}'s turn..."
-                    )
-
-                    boss_messages = boss.choose_ai_action(player)
-
-                    add_messages(boss_messages)
+                    boss_turn()
 
                 st.rerun()
+
 
     # ========================================================
     # BATTLE LOG
@@ -575,14 +611,13 @@ else:
 
     st.subheader("📜 Battle Log")
 
-    for message in reversed(
-        st.session_state.battle_log
-    ):
+    for message in st.session_state.battle_log:
 
         st.write(message)
 
+
     # ========================================================
-    # RESTART
+    # RESTART GAME
     # ========================================================
 
     st.divider()
@@ -592,9 +627,6 @@ else:
         use_container_width=True
     ):
 
-        st.session_state.game_started = False
-        st.session_state.player = None
-        st.session_state.boss = None
-        st.session_state.battle_log = []
+        reset_game()
 
         st.rerun()
