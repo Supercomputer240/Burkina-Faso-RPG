@@ -56,33 +56,23 @@ st.markdown("""
 
     .character-card {
         background: #10251a;
-
         border: 2px solid #FCD116;
-
         border-radius: 16px;
-
         padding: 20px;
-
         margin-bottom: 12px;
     }
 
     .character-name {
         text-align: center;
-
         font-size: 25px;
-
         font-weight: 800;
-
         color: #FCD116;
     }
 
     .character-hp {
         text-align: center;
-
         font-size: 18px;
-
         margin-top: 12px;
-
         color: white;
     }
 
@@ -92,21 +82,13 @@ st.markdown("""
        ======================================================== */
 
     .stButton > button {
-
         width: 100%;
-
         height: 58px;
-
         border-radius: 12px;
-
         font-size: 17px;
-
         font-weight: 800;
-
         color: white;
-
         background-color: #16251c;
-
         border: 2px solid #009E49;
 
         transition:
@@ -116,13 +98,9 @@ st.markdown("""
     }
 
     .stButton > button:hover {
-
         background-color: #1d3828;
-
         border-color: #FCD116;
-
         transform: scale(1.02);
-
         color: #FCD116;
     }
 
@@ -185,7 +163,6 @@ class Character:
 
 
     def is_alive(self):
-
         return self.health > 0
 
 
@@ -201,7 +178,6 @@ class Character:
     def crit_check(self, damage):
 
         if random.random() < 0.20:
-
             return int(damage * 1.5), "🔥 Critical Hit!"
 
         return damage, ""
@@ -213,7 +189,7 @@ class Character:
 
         damage, crit_message = self.crit_check(damage)
 
-        other.health -= damage
+        other.health = max(0, other.health - damage)
 
         messages = []
 
@@ -283,7 +259,6 @@ class Warrior(Character):
     def crit_check(self, damage):
 
         if random.random() < 0.35:
-
             return int(damage * 1.5), "🔥 Critical Hit!"
 
         return damage, ""
@@ -299,7 +274,10 @@ class Warrior(Character):
 
             self.mana -= 15
 
-            other.health -= damage
+            other.health = max(
+                0,
+                other.health - damage
+            )
 
             messages = []
 
@@ -337,7 +315,10 @@ class Paladin(Character):
 
             self.mana -= 15
 
-            other.health -= damage
+            other.health = max(
+                0,
+                other.health - damage
+            )
 
             messages = []
 
@@ -396,7 +377,10 @@ class Boss(Character):
 
             self.mana -= 20
 
-            target.health -= damage
+            target.health = max(
+                0,
+                target.health - damage
+            )
 
             messages.append(
                 f"💀 {target.name} is hit for "
@@ -413,7 +397,9 @@ class Boss(Character):
         options = []
 
 
+        # --------------------------------------------------------
         # HEAL
+        # --------------------------------------------------------
 
         if self.health < 60 and self.mana >= 10:
 
@@ -422,7 +408,9 @@ class Boss(Character):
             )
 
 
+        # --------------------------------------------------------
         # MEDITATE
+        # --------------------------------------------------------
 
         if self.mana < 10:
 
@@ -431,7 +419,9 @@ class Boss(Character):
             )
 
 
+        # --------------------------------------------------------
         # SPECIAL
+        # --------------------------------------------------------
 
         if self.mana >= 20:
 
@@ -440,14 +430,16 @@ class Boss(Character):
             )
 
 
+        # --------------------------------------------------------
         # BASIC ATTACK
+        # --------------------------------------------------------
 
         options.append(
             ("basic", 5 + random.randint(0, 5))
         )
 
 
-        # CHOOSE BEST ACTION
+        # Choose highest scoring action
 
         best = max(
             options,
@@ -455,7 +447,7 @@ class Boss(Character):
         )[0]
 
 
-        # PERFORM ACTION
+        # Perform action
 
         if best == "heal":
 
@@ -511,18 +503,14 @@ def add_messages(messages):
 def reset_game():
 
     st.session_state.game_started = False
-
     st.session_state.player = None
-
     st.session_state.boss = None
-
     st.session_state.battle_log = []
 
 
 def boss_turn():
 
     player = st.session_state.player
-
     boss = st.session_state.boss
 
     if boss.is_alive() and player.is_alive():
@@ -568,11 +556,9 @@ if not st.session_state.game_started:
         else:
 
             if class_choice == "Warrior":
-
                 player = Warrior(name)
 
             else:
-
                 player = Paladin(name)
 
 
@@ -580,11 +566,11 @@ if not st.session_state.game_started:
 
 
             st.session_state.player = player
-
             st.session_state.boss = boss
 
 
-            # ONLY CREATED ONCE AT THE START
+            # These messages happen ONLY when
+            # a new battle begins.
 
             st.session_state.battle_log = [
                 "⚔️ Battle Start!",
@@ -605,7 +591,6 @@ if not st.session_state.game_started:
 else:
 
     player = st.session_state.player
-
     boss = st.session_state.boss
 
 
@@ -614,19 +599,12 @@ else:
     # ========================================================
 
     st.markdown(
-        f"""
-        <div class="character-card">
-
-            <div class="character-name">
-                🪖 {player.name}
-            </div>
-
-            <div class="character-hp">
-                ❤️ HP: {max(player.health, 0)}/{player.max_health}
-            </div>
-
-        </div>
-        """,
+        f'<div class="character-card">'
+        f'<div class="character-name">🪖 {player.name}</div>'
+        f'<div class="character-hp">'
+        f'❤️ HP: {max(player.health, 0)}/{player.max_health}'
+        f'</div>'
+        f'</div>',
         unsafe_allow_html=True
     )
 
@@ -654,19 +632,12 @@ else:
     # ========================================================
 
     st.markdown(
-        f"""
-        <div class="character-card">
-
-            <div class="character-name">
-                👹 {boss.name}
-            </div>
-
-            <div class="character-hp">
-                ❤️ HP: {max(boss.health, 0)}/{boss.max_health}
-            </div>
-
-        </div>
-        """,
+        f'<div class="character-card">'
+        f'<div class="character-name">👹 {boss.name}</div>'
+        f'<div class="character-hp">'
+        f'❤️ HP: {max(boss.health, 0)}/{boss.max_health}'
+        f'</div>'
+        f'</div>',
         unsafe_allow_html=True
     )
 
@@ -786,7 +757,6 @@ else:
 
                 add_messages(messages)
 
-
                 if success and boss.is_alive():
 
                     boss_turn()
@@ -810,7 +780,7 @@ else:
                 add_messages(message)
 
 
-                # Failed heal DOES NOT consume a turn
+                # Failed healing does NOT use a turn.
 
                 if success and boss.is_alive():
 
@@ -833,7 +803,6 @@ else:
                 message = player.meditate()
 
                 add_messages(message)
-
 
                 if boss.is_alive():
 
