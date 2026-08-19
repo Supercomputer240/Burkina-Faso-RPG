@@ -31,7 +31,6 @@ st.markdown("""
             #0b2418 50%,
             #24100f 100%
         );
-
         color: white;
     }
 
@@ -157,6 +156,9 @@ class Character:
         self.mana = 50
         self.max_mana = 50
 
+        # Status effects
+        self.stunned = False
+
 
     def is_alive(self):
 
@@ -190,7 +192,9 @@ class Character:
 
         damage = random.randint(5, 10)
 
-        damage, crit_message = self.crit_check(damage)
+        damage, crit_message = self.crit_check(
+            damage
+        )
 
         other.health = max(
             0,
@@ -357,15 +361,22 @@ class Paladin(Character):
                 f"for {damage} damage!"
             )
 
-            # 25% stun chance
+
+            # ------------------------------------------------
+            # STUN
+            # ------------------------------------------------
 
             if random.random() < 0.25:
+
+                other.stunned = True
 
                 messages.append(
                     f"⚡ {other.name} is stunned!"
                 )
 
+
             return True, messages
+
 
         return False, [
             "Not enough mana for Divine Smite."
@@ -431,9 +442,9 @@ class Boss(Character):
         options = []
 
 
-        # --------------------------------------------------------
+        # ----------------------------------------------------
         # HEAL
-        # --------------------------------------------------------
+        # ----------------------------------------------------
 
         if self.health < 60 and self.mana >= 10:
 
@@ -445,9 +456,9 @@ class Boss(Character):
             )
 
 
-        # --------------------------------------------------------
+        # ----------------------------------------------------
         # MEDITATE
-        # --------------------------------------------------------
+        # ----------------------------------------------------
 
         if self.mana < 10:
 
@@ -459,9 +470,9 @@ class Boss(Character):
             )
 
 
-        # --------------------------------------------------------
+        # ----------------------------------------------------
         # SPECIAL
-        # --------------------------------------------------------
+        # ----------------------------------------------------
 
         if self.mana >= 20:
 
@@ -473,9 +484,9 @@ class Boss(Character):
             )
 
 
-        # --------------------------------------------------------
+        # ----------------------------------------------------
         # BASIC ATTACK
-        # --------------------------------------------------------
+        # ----------------------------------------------------
 
         options.append(
             (
@@ -485,7 +496,7 @@ class Boss(Character):
         )
 
 
-        # Pick highest score
+        # Choose highest scoring action
 
         best = max(
             options,
@@ -577,25 +588,55 @@ def reset_game():
     st.session_state.battle_log = []
 
 
+# ============================================================
+# BOSS TURN
+# ============================================================
+
 def boss_turn():
 
     player = st.session_state.player
-
     boss = st.session_state.boss
 
-    if boss.is_alive() and player.is_alive():
+
+    if not boss.is_alive() or not player.is_alive():
+
+        return
+
+
+    add_messages(
+        f"👹 {boss.name}'s turn..."
+    )
+
+
+    # ========================================================
+    # STUN CHECK
+    # ========================================================
+
+    if boss.stunned:
 
         add_messages(
-            f"👹 {boss.name}'s turn..."
+            f"⚡ {boss.name} is stunned "
+            f"and loses their turn!"
         )
 
-        boss_messages = boss.choose_ai_action(
-            player
-        )
+        # Stun lasts for exactly one turn
 
-        add_messages(
-            boss_messages
-        )
+        boss.stunned = False
+
+        return
+
+
+    # ========================================================
+    # NORMAL BOSS AI
+    # ========================================================
+
+    boss_messages = boss.choose_ai_action(
+        player
+    )
+
+    add_messages(
+        boss_messages
+    )
 
 
 # ============================================================
@@ -663,7 +704,7 @@ if not st.session_state.game_started:
             st.session_state.boss = boss
 
 
-            # Starting messages only happen once
+            # Starting messages happen only once
 
             st.session_state.battle_log = [
 
@@ -719,22 +760,26 @@ else:
             unsafe_allow_html=True
         )
 
+
         st.write(
             f"❤️ HP: "
             f"{max(player.health, 0)}/"
             f"{player.max_health}"
         )
 
+
         st.progress(
             max(player.health, 0)
             / player.max_health
         )
+
 
         st.write(
             f"🔵 Mana: "
             f"{player.mana}/"
             f"{player.max_mana}"
         )
+
 
         st.progress(
             player.mana
@@ -759,22 +804,26 @@ else:
             unsafe_allow_html=True
         )
 
+
         st.write(
             f"❤️ HP: "
             f"{max(boss.health, 0)}/"
             f"{boss.max_health}"
         )
 
+
         st.progress(
             max(boss.health, 0)
             / boss.max_health
         )
+
 
         st.write(
             f"🔵 Mana: "
             f"{boss.mana}/"
             f"{boss.max_mana}"
         )
+
 
         st.progress(
             boss.mana
@@ -871,9 +920,11 @@ else:
                     messages
                 )
 
+
                 if boss.is_alive():
 
                     boss_turn()
+
 
                 st.rerun()
 
@@ -890,19 +941,23 @@ else:
             ):
 
                 success, messages = (
-                    player.special_attack(boss)
+                    player.special_attack(
+                        boss
+                    )
                 )
 
                 add_messages(
                     messages
                 )
 
-                # Failed special attack
-                # does NOT use a turn
+
+                # Failed special attacks
+                # do not consume a turn
 
                 if success and boss.is_alive():
 
                     boss_turn()
+
 
                 st.rerun()
 
@@ -924,12 +979,14 @@ else:
                     message
                 )
 
-                # Failed healing does NOT
-                # consume the player's turn
+
+                # Failed healing does not
+                # consume a turn
 
                 if success and boss.is_alive():
 
                     boss_turn()
+
 
                 st.rerun()
 
@@ -951,9 +1008,11 @@ else:
                     message
                 )
 
+
                 if boss.is_alive():
 
                     boss_turn()
+
 
                 st.rerun()
 
