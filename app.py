@@ -1,7 +1,6 @@
 import streamlit as st
 import random
 
-
 # ============================================================
 # PAGE SETUP
 # ============================================================
@@ -12,181 +11,100 @@ st.set_page_config(
     layout="centered"
 )
 
-
 # ============================================================
-# CUSTOM UI
+# CUSTOM UI / BURKINA FASO THEME
 # ============================================================
 
 st.markdown("""
 <style>
 
-    /* ========================================================
-       BURKINA FASO THEME
-       ======================================================== */
+.stApp {
+    background: linear-gradient(
+        135deg,
+        #071a12 0%,
+        #0b2418 45%,
+        #24100f 100%
+    );
+    color: white;
+}
 
-    .stApp {
-        background:
-            linear-gradient(
-                135deg,
-                #071a12 0%,
-                #0b2418 45%,
-                #24100f 100%
-            );
-        color: white;
-    }
+.main-title {
+    text-align: center;
+    font-size: 48px;
+    font-weight: 900;
+    color: #FCD116;
+    text-shadow: 0px 0px 12px rgba(252, 209, 22, 0.35);
+    margin-bottom: 30px;
+}
 
-    /* --------------------------------------------------------
-       MAIN TITLE
-       -------------------------------------------------------- */
+.character-card {
+    background: linear-gradient(
+        145deg,
+        #10251a,
+        #19120f
+    );
 
-    .main-title {
-        text-align: center;
-        font-size: 48px;
-        font-weight: 900;
-        color: #FCD116;
-        text-shadow:
-            0px 0px 12px rgba(252, 209, 22, 0.35);
-        margin-bottom: 30px;
-    }
+    border: 2px solid #FCD116;
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 15px;
 
-    /* --------------------------------------------------------
-       CHARACTER CARDS
-       -------------------------------------------------------- */
+    box-shadow:
+        0px 0px 15px rgba(252, 209, 22, 0.12);
+}
 
-    .character-card {
-        background:
-            linear-gradient(
-                145deg,
-                #10251a,
-                #19120f
-            );
+.character-name {
+    text-align: center;
+    font-size: 25px;
+    font-weight: 800;
+    color: #FCD116;
+}
 
-        border: 2px solid #FCD116;
-        border-radius: 18px;
+.battle-log {
+    background-color: rgba(10, 20, 14, 0.9);
+    border: 2px solid #EF2B2D;
+    border-radius: 15px;
+    padding: 18px;
+    margin-top: 20px;
+    max-height: 300px;
+    overflow-y: auto;
+}
 
-        padding: 20px;
+.log-entry {
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(252, 209, 22, 0.12);
+}
 
-        margin-bottom: 15px;
+.stButton > button {
+    width: 100%;
+    height: 58px;
+    border-radius: 12px;
+    font-size: 17px;
+    font-weight: 800;
+    color: white;
+    background-color: #16251c;
+    border: 2px solid #009E49;
 
-        box-shadow:
-            0px 0px 15px rgba(252, 209, 22, 0.12);
-    }
+    transition:
+        transform 0.15s,
+        background-color 0.15s,
+        border-color 0.15s;
+}
 
-    .character-name {
-        text-align: center;
+.stButton > button:hover {
+    background-color: #1d3828;
+    border-color: #FCD116;
+    transform: scale(1.02);
+    color: #FCD116;
+}
 
-        font-size: 25px;
-        font-weight: 800;
+div[data-testid="stProgress"] > div > div {
+    background-color: #009E49;
+}
 
-        color: #FCD116;
-    }
-
-    /* --------------------------------------------------------
-       BATTLE AREA
-       -------------------------------------------------------- */
-
-    .battle-area {
-        background-color: rgba(0, 0, 0, 0.25);
-
-        border: 1px solid rgba(252, 209, 22, 0.35);
-
-        border-radius: 20px;
-
-        padding: 25px;
-
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
-
-    /* --------------------------------------------------------
-       BUTTONS
-       -------------------------------------------------------- */
-
-    .stButton > button {
-
-        width: 100%;
-
-        height: 58px;
-
-        border-radius: 12px;
-
-        font-size: 17px;
-
-        font-weight: 800;
-
-        color: white;
-
-        background-color: #16251c;
-
-        border: 2px solid #009E49;
-
-        transition:
-            transform 0.15s,
-            background-color 0.15s,
-            border-color 0.15s;
-
-    }
-
-    .stButton > button:hover {
-
-        background-color: #1d3828;
-
-        border-color: #FCD116;
-
-        transform: scale(1.02);
-
-        color: #FCD116;
-    }
-
-    /* --------------------------------------------------------
-       PROGRESS BARS
-       -------------------------------------------------------- */
-
-    div[data-testid="stProgress"] > div > div {
-        background-color: #009E49;
-    }
-
-    /* --------------------------------------------------------
-       BATTLE LOG
-       -------------------------------------------------------- */
-
-    .battle-log {
-
-        background-color: rgba(10, 20, 14, 0.9);
-
-        border: 2px solid #EF2B2D;
-
-        border-radius: 15px;
-
-        padding: 18px;
-
-        margin-top: 20px;
-
-        max-height: 300px;
-
-        overflow-y: auto;
-    }
-
-    .log-entry {
-        padding: 5px 0;
-        border-bottom: 1px solid rgba(252, 209, 22, 0.12);
-    }
-
-    /* --------------------------------------------------------
-       DIVIDERS
-       -------------------------------------------------------- */
-
-    hr {
-        border-color: rgba(252, 209, 22, 0.35);
-    }
-
-    /* --------------------------------------------------------
-       SUCCESS / ERROR BOXES
-       -------------------------------------------------------- */
-
-    div[data-testid="stAlert"] {
-        border-radius: 12px;
-    }
+hr {
+    border-color: rgba(252, 209, 22, 0.35);
+}
 
 </style>
 """, unsafe_allow_html=True)
@@ -203,7 +121,7 @@ st.markdown(
 
 
 # ============================================================
-# BASE CHARACTER CLASS
+# BASE CHARACTER
 # ============================================================
 
 class Character:
@@ -218,15 +136,7 @@ class Character:
     def is_alive(self):
         return self.health > 0
 
-    def status(self):
-        return (
-            f"{self.name} ➤ "
-            f"HP: {self.health}/{self.max_health} | "
-            f"Mana: {self.mana}/{self.max_mana}"
-        )
-
     def crit_check(self, damage):
-        """20% chance to deal 1.5x damage."""
 
         if random.random() < 0.20:
             return int(damage * 1.5), "🔥 Critical Hit!"
@@ -305,7 +215,6 @@ class Warrior(Character):
     CLASS_NAME = "Warrior"
 
     def crit_check(self, damage):
-        """35% chance to deal 1.5x damage."""
 
         if random.random() < 0.35:
             return int(damage * 1.5), "🔥 Critical Hit!"
@@ -432,19 +341,11 @@ class Boss(Character):
 
         options = []
 
-        # ----------------------------------------------------
-        # HEAL
-        # ----------------------------------------------------
-
         if self.health < 60 and self.mana >= 10:
 
             options.append(
                 ("heal", 40 + (60 - self.health))
             )
-
-        # ----------------------------------------------------
-        # MEDITATE
-        # ----------------------------------------------------
 
         if self.mana < 10:
 
@@ -452,32 +353,20 @@ class Boss(Character):
                 ("meditate", 30 - self.mana)
             )
 
-        # ----------------------------------------------------
-        # SPECIAL
-        # ----------------------------------------------------
-
         if self.mana >= 20:
 
             options.append(
                 ("special", 10 + (100 - target.health))
             )
 
-        # ----------------------------------------------------
-        # BASIC ATTACK
-        # ----------------------------------------------------
-
         options.append(
             ("basic", 5 + random.randint(0, 5))
         )
-
-        # Choose highest score
 
         best = max(
             options,
             key=lambda x: x[1]
         )[0]
-
-        # Perform action
 
         if best == "heal":
 
@@ -522,29 +411,23 @@ if "battle_log" not in st.session_state:
 def add_messages(messages):
 
     if isinstance(messages, str):
-
         st.session_state.battle_log.append(messages)
 
     else:
-
         st.session_state.battle_log.extend(messages)
 
 
 def reset_game():
 
     st.session_state.game_started = False
-
     st.session_state.player = None
-
     st.session_state.boss = None
-
     st.session_state.battle_log = []
 
 
 def boss_turn():
 
     player = st.session_state.player
-
     boss = st.session_state.boss
 
     if boss.is_alive() and player.is_alive():
@@ -553,9 +436,7 @@ def boss_turn():
             f"👹 {boss.name}'s turn..."
         )
 
-        boss_messages = boss.choose_ai_action(
-            player
-        )
+        boss_messages = boss.choose_ai_action(player)
 
         add_messages(boss_messages)
 
@@ -584,42 +465,26 @@ if not st.session_state.game_started:
 
         if name.strip() == "":
 
-            st.error(
-                "Please enter a name."
-            )
+            st.error("Please enter a name.")
 
         else:
 
-            # Create player
-
             if class_choice == "Warrior":
-
                 player = Warrior(name)
-
             else:
-
                 player = Paladin(name)
-
-            # Create boss
 
             boss = Boss()
 
-            # Save game
-
             st.session_state.player = player
-
             st.session_state.boss = boss
 
-            # Starting messages ONLY happen once
+            # These only appear when starting the game
 
             st.session_state.battle_log = [
-
                 "⚔️ Battle Start!",
-
                 f"{player.name} enters the battlefield!",
-
                 "👹 A powerful enemy stands in your way!"
-
             ]
 
             st.session_state.game_started = True
@@ -634,18 +499,16 @@ if not st.session_state.game_started:
 else:
 
     player = st.session_state.player
-
     boss = st.session_state.boss
 
 
     # ========================================================
-    # PLAYER STATUS
+    # PLAYER CARD
     # ========================================================
 
     st.markdown(
         f"""
         <div class="character-card">
-
             <div class="character-name">
                 🪖 {player.name}
             </div>
@@ -654,7 +517,6 @@ else:
 
             ❤️ HP:
             {max(player.health, 0)}/{player.max_health}
-
         </div>
         """,
         unsafe_allow_html=True
@@ -673,17 +535,17 @@ else:
         player.mana / player.max_mana
     )
 
+
     st.divider()
 
 
     # ========================================================
-    # BOSS STATUS
+    # BOSS CARD
     # ========================================================
 
     st.markdown(
         f"""
         <div class="character-card">
-
             <div class="character-name">
                 👹 {boss.name}
             </div>
@@ -692,7 +554,6 @@ else:
 
             ❤️ HP:
             {max(boss.health, 0)}/{boss.max_health}
-
         </div>
         """,
         unsafe_allow_html=True
@@ -711,6 +572,7 @@ else:
         boss.mana / boss.max_mana
     )
 
+
     st.divider()
 
 
@@ -724,9 +586,7 @@ else:
             f"💀 {player.name} has been defeated..."
         )
 
-        st.subheader(
-            "Game Over"
-        )
+        st.subheader("Game Over")
 
         if st.button(
             "🔄 Restart",
@@ -734,7 +594,6 @@ else:
         ):
 
             reset_game()
-
             st.rerun()
 
 
@@ -748,9 +607,7 @@ else:
             f"🎉 {boss.name} has been defeated!"
         )
 
-        st.subheader(
-            "🏆 Victory!"
-        )
+        st.subheader("🏆 Victory!")
 
         if st.button(
             "🔄 Play Again",
@@ -758,7 +615,6 @@ else:
         ):
 
             reset_game()
-
             st.rerun()
 
 
@@ -775,9 +631,7 @@ else:
         col1, col2 = st.columns(2)
 
 
-        # ----------------------------------------------------
         # BASIC ATTACK
-        # ----------------------------------------------------
 
         with col1:
 
@@ -786,22 +640,17 @@ else:
                 use_container_width=True
             ):
 
-                messages = player.basic_attack(
-                    boss
-                )
+                messages = player.basic_attack(boss)
 
                 add_messages(messages)
 
                 if boss.is_alive():
-
                     boss_turn()
 
                 st.rerun()
 
 
-        # ----------------------------------------------------
         # SPECIAL ATTACK
-        # ----------------------------------------------------
 
         with col2:
 
@@ -816,18 +665,13 @@ else:
 
                 add_messages(messages)
 
-                # Failed special does NOT use a turn
-
                 if success and boss.is_alive():
-
                     boss_turn()
 
                 st.rerun()
 
 
-        # ----------------------------------------------------
         # HEAL
-        # ----------------------------------------------------
 
         with col1:
 
@@ -840,18 +684,15 @@ else:
 
                 add_messages(message)
 
-                # Failed healing does NOT use a turn
+                # Failed heal does NOT use a turn
 
                 if success and boss.is_alive():
-
                     boss_turn()
 
                 st.rerun()
 
 
-        # ----------------------------------------------------
         # MEDITATE
-        # ----------------------------------------------------
 
         with col2:
 
@@ -865,7 +706,6 @@ else:
                 add_messages(message)
 
                 if boss.is_alive():
-
                     boss_turn()
 
                 st.rerun()
@@ -877,18 +717,16 @@ else:
 
     st.divider()
 
-    st.subheader(
-        "📜 Battle Log"
-    )
+    st.subheader("📜 Battle Log")
 
     log_html = '<div class="battle-log">'
 
     for message in st.session_state.battle_log:
 
         log_html += (
-            f'<div class="log-entry">'
-            f'{message}'
-            f'</div>'
+            '<div class="log-entry">'
+            + str(message)
+            + '</div>'
         )
 
     log_html += "</div>"
@@ -900,7 +738,7 @@ else:
 
 
     # ========================================================
-    # RESTART GAME
+    # RESTART
     # ========================================================
 
     st.divider()
@@ -911,5 +749,4 @@ else:
     ):
 
         reset_game()
-
         st.rerun()
